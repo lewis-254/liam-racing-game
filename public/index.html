@@ -65,9 +65,42 @@
     margin-bottom: 12px;
     line-height: 1.7;
   }
+
+  /* ── Nickname ── */
+  .nick-section {
+    margin-bottom: 12px;
+    width: 100%;
+  }
+  .nick-section .lbl {
+    font-size: 0.65rem;
+    color: #888;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  #nicknameInput {
+    background: #111;
+    border: 2px solid #444;
+    color: #fff;
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 0.9rem;
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-align: center;
+    width: 160px;
+    outline: none;
+    letter-spacing: 1px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  #nicknameInput:focus {
+    border-color: #e30000;
+    box-shadow: 0 0 8px #e3000066;
+  }
+  #nicknameInput::placeholder { color: #444; font-family: Arial; font-style: italic; }
+
   /* Level select */
   .level-section {
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     width: 100%;
   }
   .level-section .lbl {
@@ -100,6 +133,39 @@
     color: #fff;
     box-shadow: 0 0 12px #e30000aa;
   }
+
+  /* ── Overlay mini-leaderboard ── */
+  #overlayLb {
+    width: 100%;
+    margin-bottom: 10px;
+    display: none;
+  }
+  .olb-title {
+    font-size: 0.58rem;
+    color: #e30000;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-bottom: 5px;
+    text-shadow: 0 0 6px #e3000066;
+  }
+  .olb-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+  .olb-row.olb-me { background: rgba(227,0,0,0.15); }
+  .olb-pos { font-size: 0.6rem; color: #666; width: 18px; text-align: right; flex-shrink: 0; }
+  .olb-row:first-of-type .olb-pos { color: #ffd700; }
+  .olb-name {
+    flex: 1; font-size: 0.7rem; color: #ccc;
+    font-family: Arial, sans-serif;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left;
+  }
+  .olb-row.olb-me .olb-name { color: #fff; }
+  .olb-score { font-size: 0.67rem; color: #ffd700; font-family: Arial, sans-serif; flex-shrink: 0; }
+
   /* Score area */
   #overlay .score-display {
     font-size: 1.4rem;
@@ -109,7 +175,7 @@
   #overlay .best-display {
     font-size: 0.85rem;
     color: #ffd700;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   #startBtn {
     background: linear-gradient(135deg, #e30000, #9b0000);
@@ -126,6 +192,7 @@
   }
   #startBtn:hover { transform: scale(1.07); box-shadow: 0 0 36px #e30000cc; }
   #startBtn:active { transform: scale(0.96); }
+
   /* Controls row */
   #controls {
     display: flex;
@@ -155,6 +222,7 @@
     box-shadow: none;
   }
   #btnPause.paused { border-color: #ffcc00; color: #ffcc00; }
+
   /* HUD */
   #hud {
     position: absolute;
@@ -170,6 +238,81 @@
   }
   #hudLeft { display: flex; flex-direction: column; gap: 2px; }
   #hudBest { font-size: 0.68rem; color: #ffd700; opacity: 0.9; }
+  #hudRight { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  #hudRank { font-size: 0.68rem; color: #e30000; text-shadow: 0 0 6px #e3000088, 1px 1px 4px #000; }
+
+  /* ── Side Leaderboard Panel ── */
+  #lbPanel {
+    position: absolute;
+    left: calc(100% + 14px);
+    top: 0;
+    width: 170px;
+    background: rgba(0, 0, 10, 0.92);
+    border: 2px solid #e30000;
+    border-radius: 8px;
+    box-shadow: 0 0 24px #e3000033;
+    padding: 10px 8px 14px;
+    color: #fff;
+    font-family: 'Arial Black', Arial, sans-serif;
+  }
+  .lb-header {
+    font-size: 0.6rem;
+    color: #e30000;
+    letter-spacing: 3px;
+    text-align: center;
+    margin-bottom: 10px;
+    text-shadow: 0 0 8px #e3000066;
+  }
+  #lbList {
+    position: relative;
+    overflow: hidden;
+    min-height: 28px;
+    transition: height 0.3s ease;
+  }
+  .lb-entry {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 4px;
+    border-radius: 4px;
+    transition: top 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-sizing: border-box;
+  }
+  .lb-entry.lb-current {
+    background: rgba(227, 0, 0, 0.18);
+    border: 1px solid rgba(227, 0, 0, 0.45);
+  }
+  @keyframes lbOvertakePulse {
+    0%   { box-shadow: 0 0 0 0 rgba(0, 255, 120, 0.85); }
+    60%  { box-shadow: 0 0 0 7px rgba(0, 255, 120, 0.2); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 255, 120, 0); }
+  }
+  .lb-entry.lb-overtake { animation: lbOvertakePulse 0.55s ease-out forwards; }
+  .lb-pos {
+    font-size: 0.58rem; color: #666;
+    width: 20px; text-align: right; flex-shrink: 0;
+  }
+  .lb-entry.lb-current .lb-pos { color: #e30000; }
+  .lb-name {
+    flex: 1; font-size: 0.68rem; color: #ccc;
+    font-family: Arial, sans-serif;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  }
+  .lb-entry.lb-current .lb-name { color: #fff; font-weight: bold; }
+  .lb-score {
+    font-size: 0.65rem; color: #ffd700;
+    font-family: Arial, sans-serif;
+    flex-shrink: 0; min-width: 36px; text-align: right;
+  }
+  .lb-entry.lb-current .lb-score { color: #ff7777; }
+  .lb-empty {
+    font-size: 0.62rem; color: #444; text-align: center;
+    padding: 6px 4px; font-family: Arial, sans-serif; line-height: 1.5;
+  }
+
+  @media (max-width: 660px) { #lbPanel { display: none; } }
 </style>
 </head>
 <body>
@@ -182,7 +325,10 @@
       <span id="hudBest">Best: 0</span>
     </div>
     <span id="hudLives">❤️❤️❤️</span>
-    <span id="hudSpeed">Lvl 1</span>
+    <div id="hudRight">
+      <span id="hudSpeed">Lvl 1</span>
+      <span id="hudRank"></span>
+    </div>
   </div>
   <div id="overlay">
     <h1>🏎️ TURBO DASH</h1>
@@ -191,6 +337,12 @@
       Dodge the traffic — don't crash!<br>
       Grab the golden egg to restore a life!<br>
       ◀ ▶ Arrow keys · P to pause
+    </div>
+
+    <div class="nick-section">
+      <div class="lbl">Your name</div>
+      <input type="text" id="nicknameInput" maxlength="12" placeholder="Enter nickname"
+             spellcheck="false" autocomplete="off" />
     </div>
 
     <div class="level-section">
@@ -206,7 +358,16 @@
 
     <div class="score-display" id="finalScore"></div>
     <div class="best-display"  id="bestScore"></div>
+
+    <div id="overlayLb"></div>
+
     <button id="startBtn">START RACE 🚦</button>
+  </div>
+
+  <!-- Side leaderboard panel (desktop only) -->
+  <div id="lbPanel">
+    <div class="lb-header">LEADERBOARD</div>
+    <div id="lbList"></div>
   </div>
 </div>
 
@@ -221,27 +382,178 @@ const canvas      = document.getElementById('c');
 const ctx         = canvas.getContext('2d');
 const W = 420, H = 640;
 
-const overlay      = document.getElementById('overlay');
-const startBtn     = document.getElementById('startBtn');
-const finalScoreEl = document.getElementById('finalScore');
-const bestScoreEl  = document.getElementById('bestScore');
-const hudScore     = document.getElementById('hudScore');
-const hudBest      = document.getElementById('hudBest');
-const hudLives     = document.getElementById('hudLives');
-const hudSpeed     = document.getElementById('hudSpeed');
-const btnLeft      = document.getElementById('btnLeft');
-const btnRight     = document.getElementById('btnRight');
-const btnPause     = document.getElementById('btnPause');
+const overlay       = document.getElementById('overlay');
+const startBtn      = document.getElementById('startBtn');
+const finalScoreEl  = document.getElementById('finalScore');
+const bestScoreEl   = document.getElementById('bestScore');
+const hudScore      = document.getElementById('hudScore');
+const hudBest       = document.getElementById('hudBest');
+const hudLives      = document.getElementById('hudLives');
+const hudSpeed      = document.getElementById('hudSpeed');
+const hudRank       = document.getElementById('hudRank');
+const btnLeft       = document.getElementById('btnLeft');
+const btnRight      = document.getElementById('btnRight');
+const btnPause      = document.getElementById('btnPause');
+const nicknameInput = document.getElementById('nicknameInput');
 
 const LANES        = [84, 168, 252, 336];
 const CAR_H        = 90;
 const ENEMY_COLORS = ['#1565C0','#2E7D32','#F57F17','#6A1B9A','#00695C','#37474F','#c62828'];
 const ENEMY_SHAPES = ['sedan','sedan','truck','sport'];
 
+// ─── Supabase config — paste your project URL and anon key here ──────────────
+const SB_URL = 'https://jjvnnrxkavebegxrzwvw.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impqdm5ucnhrYXZlYmVneHJ6d3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDEyMTMsImV4cCI6MjA5NTgxNzIxM30.audqMxIEb8YEUxM6uRPBkAYBai8OVvrXXcvVnKlJxL4';
+
 let best       = parseInt(localStorage.getItem('turboBest') || '0');
 let startLevel = 1;
 let state, raf;
 let countdownStart = 0;
+
+// ─── Leaderboard ──────────────────────────────────────────────────────────────
+let nickname     = localStorage.getItem('turboNickname') || '';
+let cachedScores = [];
+let lbLastRank   = 0;
+
+nicknameInput.value = nickname;
+nicknameInput.addEventListener('input', () => {
+  nickname = nicknameInput.value;
+  localStorage.setItem('turboNickname', nickname);
+});
+
+async function fetchScores() {
+  try {
+    const r = await fetch(
+      `${SB_URL}/rest/v1/scores?select=nickname,score,level&order=score.desc&limit=10`,
+      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } }
+    );
+    if (r.ok) {
+      cachedScores = await r.json();
+      renderLb(state && state.score > 0 ? state.score : 0);
+      renderOverlayLb();
+    }
+  } catch(e) { /* keep last cached data if offline */ }
+}
+
+async function submitScore(score, level) {
+  if (score <= 0) return;
+  const nick = nickname.trim() || 'Racer';
+  try {
+    await fetch(`${SB_URL}/rest/v1/rpc/submit_score`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_nickname: nick, p_score: score, p_level: level })
+    });
+  } catch(e) {}
+  await fetchScores();
+}
+
+// ── Side panel renderer ──
+const lbEntryMap = new Map();
+const LB_ENTRY_H = 28;
+const LB_MAX     = 8;
+
+function lbEsc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function buildLbData(liveScore) {
+  const nick = nickname.trim() || 'You';
+  const combined = cachedScores.map(s => ({
+    key: 'h_' + s.nickname, nickname: s.nickname, score: s.score, isCurrent: false
+  }));
+  if (liveScore > 0) {
+    const i = combined.findIndex(e => e.nickname === nick);
+    if (i >= 0) combined.splice(i, 1);
+    combined.push({ key: 'live', nickname: nick, score: liveScore, isCurrent: true });
+    combined.sort((a, b) => b.score - a.score);
+  }
+  return combined.slice(0, LB_MAX);
+}
+
+function renderLb(liveScore) {
+  const listEl = document.getElementById('lbList');
+  const data   = buildLbData(liveScore);
+
+  const emptyEl = listEl.querySelector('.lb-empty');
+  if (data.length === 0) {
+    if (!emptyEl) listEl.innerHTML = '<div class="lb-empty">No races yet!<br>Be the first.</div>';
+    listEl.style.height = '46px';
+    return;
+  }
+  if (emptyEl) emptyEl.remove();
+
+  listEl.style.height = (data.length * LB_ENTRY_H) + 'px';
+
+  const seen = new Set();
+  data.forEach((item, rank) => {
+    seen.add(item.key);
+    let rec = lbEntryMap.get(item.key);
+    if (!rec) {
+      const el = document.createElement('div');
+      el.className = 'lb-entry' + (item.isCurrent ? ' lb-current' : '');
+      el.style.top = (rank * LB_ENTRY_H) + 'px';
+      el.innerHTML =
+        '<span class="lb-pos">#' + (rank+1) + '</span>' +
+        '<span class="lb-name">' + lbEsc(item.nickname) + '</span>' +
+        '<span class="lb-score">' + item.score.toLocaleString() + '</span>';
+      listEl.appendChild(el);
+      rec = { el, rank };
+      lbEntryMap.set(item.key, rec);
+    } else {
+      rec.el.querySelector('.lb-pos').textContent   = '#' + (rank+1);
+      rec.el.querySelector('.lb-name').textContent  = lbEsc(item.nickname);
+      rec.el.querySelector('.lb-score').textContent = item.score.toLocaleString();
+      if (rec.rank !== rank) {
+        const movedDown = rank > rec.rank;
+        if (item.isCurrent && !movedDown) {
+          // Current player overtook someone — green pulse
+          rec.el.classList.remove('lb-overtake');
+          void rec.el.offsetWidth; // restart animation
+          rec.el.classList.add('lb-overtake');
+        } else if (!item.isCurrent && movedDown) {
+          // This entry was overtaken — flash orange
+          rec.el.style.background = 'rgba(255,100,0,0.3)';
+          const el = rec.el;
+          setTimeout(() => { el.style.background = ''; }, 700);
+        }
+        rec.el.style.top = (rank * LB_ENTRY_H) + 'px';
+        rec.rank = rank;
+      }
+    }
+  });
+
+  for (const [key, rec] of lbEntryMap) {
+    if (!seen.has(key)) { rec.el.remove(); lbEntryMap.delete(key); }
+  }
+}
+
+function clearLb() {
+  document.getElementById('lbList').innerHTML = '';
+  lbEntryMap.clear();
+}
+
+function getLiveRank(score) {
+  if (score <= 0 || cachedScores.length === 0) return 0;
+  return cachedScores.filter(s => s.score > score).length + 1;
+}
+
+function renderOverlayLb() {
+  const el = document.getElementById('overlayLb');
+  if (cachedScores.length === 0) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  const nick  = nickname.trim() || 'Racer';
+  const top5  = cachedScores.slice(0, 5);
+  el.innerHTML = '<div class="olb-title">TOP RACERS</div>' +
+    top5.map((s, i) => {
+      const me = s.nickname === nick;
+      return '<div class="olb-row' + (me ? ' olb-me' : '') + '">' +
+        '<span class="olb-pos">#' + (i+1) + '</span>' +
+        '<span class="olb-name">' + lbEsc(s.nickname) + '</span>' +
+        '<span class="olb-score">' + s.score.toLocaleString() + '</span>' +
+        '</div>';
+    }).join('');
+}
 
 // ─── Level select ─────────────────────────────────────────────────────────────
 document.querySelectorAll('.lvl-btn').forEach(btn => {
@@ -315,6 +627,15 @@ btnPause.addEventListener('click', togglePause);
 
 // ─── Game control ─────────────────────────────────────────────────────────────
 function startGame() {
+  nickname = nicknameInput.value.trim() || 'Racer';
+  localStorage.setItem('turboNickname', nickname);
+  nicknameInput.value = nickname;
+
+  clearLb();
+  lbLastRank = 0;
+  renderLb(0);
+  fetchScores();
+
   state = initState(startLevel);
   state.phase = 'countdown';
   countdownStart = Date.now();
@@ -702,6 +1023,21 @@ function update() {
   hudBest.textContent  = `Best: ${best}`;
   hudLives.textContent = '❤️'.repeat(s.lives) + '🖤'.repeat(Math.max(0, 3-s.lives));
   hudSpeed.textContent = `Lvl ${s.speedLevel}`;
+
+  // Leaderboard update (throttled: every 30 frames ≈ 2× per second)
+  if (s.frameCount % 30 === 0) {
+    const rank = getLiveRank(s.score);
+    if (rank > 0 && lbLastRank > 0 && rank < lbLastRank) {
+      s.floaters.push({
+        x: W/2, y: H/2 - 30,
+        text: `#${rank} OVERTAKE! 🏁`,
+        size: 19, life: 1, col: '#00ff88', vy: -0.55
+      });
+    }
+    if (rank > 0) lbLastRank = rank;
+    hudRank.textContent = rank > 0 ? `#${rank}` : '';
+    renderLb(s.score);
+  }
 }
 
 // ─── Draw frame ───────────────────────────────────────────────────────────────
@@ -724,12 +1060,16 @@ function draw() {
 
 function endGame() {
   if (state.score > best) { best = state.score; localStorage.setItem('turboBest', best); }
+  submitScore(state.score, state.speedLevel);
+  clearLb();
+  renderLb(0);
   setTimeout(() => {
     finalScoreEl.textContent = `Score: ${state.score}`;
     bestScoreEl.textContent  = best > 0 ? `🏆 Best: ${best}` : '';
     startBtn.textContent     = 'RACE AGAIN! 🏁';
     btnPause.textContent     = '⏸';
     btnPause.classList.remove('paused');
+    renderOverlayLb();
     overlay.style.display    = 'flex';
   }, 900);
 }
@@ -754,6 +1094,15 @@ function loop() {
 // Initial idle render
 drawRoad();
 hudBest.textContent = `Best: ${best}`;
+cachedScores = [];
+fetchScores();
+renderLb(0);
+renderOverlayLb();
+
+// Poll for friends' scores every 30s during active play
+setInterval(() => {
+  if (state.phase === 'playing' || state.phase === 'paused') fetchScores();
+}, 30000);
 </script>
 </body>
 </html>
